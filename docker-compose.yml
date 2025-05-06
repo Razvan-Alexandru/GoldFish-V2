@@ -1,11 +1,11 @@
-version: "3.9"
-
 services:
-  bot:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: goldfish-v2
+  goldfish:
+    build: .
+    container_name: goldfish
     volumes:
-      - .:/app
-    command: python app.py
+      - .:/app:delegated
+    environment:
+      - DISPLAY=${DISPLAY}
+    network_mode: host 
+    stdin_open: true
+    tty: true
