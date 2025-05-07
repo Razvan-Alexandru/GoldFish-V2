@@ -84,3 +84,6 @@ def get_bishop_moves(board, row, col, colour):
 
     print(f"valid voves: {len(moves)}")
     return moves
+
+def get_queen_moves(board, row, col, colour):
+    return get_rook_moves(board, row, col, colour) + get_bishop_moves(board, row, col, colour)
