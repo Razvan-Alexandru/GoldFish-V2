@@ -1,12 +1,14 @@
 import os
 from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel
+    QMainWindow, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QGridLayout, QInputDialog
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 
-from game.board import ChessBoard
 from ui.widgets import ClickableSquare
+from ui.promotion_dialog import PromotionDialog
+
+from game.board import ChessBoard
 
 class ChessMainWindow(QMainWindow):
     def __init__(self):
@@ -92,7 +94,21 @@ class ChessMainWindow(QMainWindow):
         else:
             from_row, from_col = self.selected_from
             print(f"Selected to square: {row}, {col}")
-            moved = self.game_logic.move_piece(from_row, from_col, row, col, self.legal_moves)
+
+            piece = self.game_logic.get_piece(from_row, from_col)
+            colour = piece[0]
+
+            # Detect promotion
+            is_pawn = piece and piece.endswith("pawn")
+            final_rank = 0 if piece[0] == "w" else 7
+            promotion = None
+
+            if is_pawn and row == final_rank:
+                dialog = PromotionDialog(colour, self)
+                dialog.exec()  # blocks until user clicks
+                promotion = dialog.piece_choice
+
+            moved = self.game_logic.move_piece(from_row, from_col, row, col, self.legal_moves, promotion)
 
             if moved:
                 print("Move Successful")

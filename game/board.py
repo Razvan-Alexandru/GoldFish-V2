@@ -96,7 +96,7 @@ class ChessBoard:
         
         return legal_moves
 
-    def move_piece(self, from_row, from_col, to_row, to_col, legal_moves):
+    def move_piece(self, from_row, from_col, to_row, to_col, legal_moves, promotion=None):
 
         if (to_row, to_col) not in legal_moves:
             return False
@@ -126,22 +126,25 @@ class ChessBoard:
                 self.castling_rights[self.turn]["queenside"] = False
 
         # Handle Castling
+        is_castling = False
         if piece.endswith("king"):
             if abs(to_col - from_col) == 2:
-                row = from_row
+                is_castling = True
                 if to_col == 6: # kingside
-                    self.board[row][5] = self.board[row][7]
-                    self.board[row][7] = ""
+                    self.board[from_row][5] = self.board[from_row][7]
+                    self.board[from_row][7] = ""
                 if to_col == 2: # queenside
-                    self.board[row][3] = self.board[row][0]
-                    self.board[row][0] = ""
+                    self.board[from_row][3] = self.board[from_row][0]
+                    self.board[from_row][0] = ""
 
                 self.castling_rights[self.turn]["kingside"] = False
                 self.castling_rights[self.turn]["queenside"] = False
 
         # En passant 
+        is_en_passant = False
         if piece.endswith("pawn") and (to_row, to_col) == self.en_passant_target:
             self.board[from_row][to_col] = ""
+            is_en_passant = True
 
         # Handle en passant setting
         if piece.endswith("pawn") and abs(to_row - from_row) == 2:
@@ -149,8 +152,16 @@ class ChessBoard:
         else:
             self.en_passant_target = None
 
+        # Promotion
+        if piece.endswith("pawn"):
+            final_rank = 0 if piece[0] == "w" else 7
+            if to_row == final_rank:
+                if promotion not in ("queen", "rook", "bishop", "knight"):
+                    promotion = "queen"
+                self.board[to_row][to_col] = f"{piece[0]}_{promotion}"
+
         # Save move
-        self.move_history.append(Move(from_row, from_col, to_row, to_col, piece, captured))
+        self.move_history.append(Move(from_row, from_col, to_row, to_col, piece, captured, promotion, is_castling, is_en_passant))
     
         # Switch turn
         self.turn = "b" if self.turn == "w" else "w"
