@@ -84,7 +84,7 @@ def get_bishop_moves(board, row, col, colour):
 def get_queen_moves(board, row, col, colour):
     return get_rook_moves(board, row, col, colour) + get_bishop_moves(board, row, col, colour)
 
-def get_king_moves(board, row, col, colour):
+def get_king_moves(board, row, col, colour, castling_rights, is_in_check_pos_func):
     moves = []
     deltas = [
         (-1, -1), (-1, 0), (-1, 1),
@@ -98,5 +98,20 @@ def get_king_moves(board, row, col, colour):
             target = board[new_row][new_col]
             if target == "" or target[0] != colour:
                 moves.append((new_row, new_col))
+
+    # Castling (assume row 7 for white, 0 for black)
+    if not is_in_check_pos_func(colour, row, col):
+        back_row = 7 if colour == "w" else 0
+        
+        if castling_rights[colour]["kingside"]:
+            if (board[back_row][5] == "" and board[back_row][6] == "" and 
+                not is_in_check_pos_func(colour, back_row, 5) and not is_in_check_pos_func(colour, back_row, 6)):
+                moves.append((back_row, 6))
+
+        if castling_rights[colour]["queenside"]:
+            if (board[back_row][1] == "" and board[back_row][2] == "" and board[back_row][3] == "" and
+                not is_in_check_pos_func(colour, back_row, 2) and not is_in_check_pos_func(colour, back_row, 3)):
+                moves.append((back_row, 2))
+
 
     return moves
