@@ -1,15 +1,13 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtGui import QIcon
+from ui.main_window import ChessMainWindow
 
-class ChessMainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Goldfish V2")
-        self.setFixedSize(800, 800)
-
-if __name__ == '__main__':
+def main():
     app = QApplication(sys.argv)
     window = ChessMainWindow()
     window.show()
     sys.exit(app.exec())
+
+if __name__ == '__main__':
+    main()
