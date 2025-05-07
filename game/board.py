@@ -1,4 +1,4 @@
-from game.rules import get_pawn_moves, get_knight_moves
+from game.rules import get_pawn_moves, get_knight_moves, get_rook_moves, get_bishop_moves
 from game.move import Move
 
 class ChessBoard:
@@ -39,6 +39,10 @@ class ChessBoard:
             return get_pawn_moves(self.board, row, col, colour, self.en_passant_target)
         if piece_type == "knight":
             return get_knight_moves(self.board, row, col, colour)
+        if piece_type == "rook":
+            return get_rook_moves(self.board, row, col, colour)
+        if piece_type == "bishop":
+            return get_bishop_moves(self.board, row, col, colour)
         
         return []
 
