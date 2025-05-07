@@ -22,7 +22,7 @@ def get_pawn_moves(board, row, col, colour, en_passant_target):
                 moves.append((new_row, new_col))
 
             if (new_row, new_col) == en_passant_target:
-                moves.append((new_row, new_col))
+                moves.append((new_row, new_col)) # en passant possible
 
     print(f"valid voves: {len(moves)}")
     return moves
@@ -87,3 +87,20 @@ def get_bishop_moves(board, row, col, colour):
 
 def get_queen_moves(board, row, col, colour):
     return get_rook_moves(board, row, col, colour) + get_bishop_moves(board, row, col, colour)
+
+def get_king_moves(board, row, col, colour):
+    moves = []
+    deltas = [
+        (-1, -1), (-1, 0), (-1, 1),
+        (0, -1),           (0, 1),
+        (1, -1),  (1, 0),  (1, 1)
+    ]
+
+    for to_row, to_col in deltas:
+        new_row, new_col = row + to_row, col + to_col
+        if 0 <= new_row < 8 and 0 <= new_col < 8:
+            target = board[new_row][new_col]
+            if target == "" or target[0] != colour:
+                moves.append((new_row, new_col))
+
+    return moves
