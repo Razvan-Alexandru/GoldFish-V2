@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 
 from game.board import ChessBoard
-from ui.widgets import ClickableSqare
+from ui.widgets import ClickableSquare
 
 class ChessMainWindow(QMainWindow):
     def __init__(self):
@@ -58,7 +58,7 @@ class ChessMainWindow(QMainWindow):
         layout.setContentsMargins(0, 0, 0, 0)
         for row in range(8):
             for col in range(8):
-                square = ClickableSqare(row, col)
+                square = ClickableSquare(row, col)
                 square.setFixedSize(80,80)
                 square.clicked.connect(self._on_square_clicked)
 

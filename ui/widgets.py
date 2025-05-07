@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QLabel
 from PyQt6.QtCore import pyqtSignal
 
-class ClickableSqare(QLabel):
+class ClickableSquare(QLabel):
     clicked = pyqtSignal(int, int)
 
     def __init__(self, row, col):
