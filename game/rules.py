@@ -24,4 +24,19 @@ def get_pawn_moves(board, row, col, colour, en_passant_target):
             if (new_row, new_col) == en_passant_target:
                 moves.append((new_row, new_col))
 
+    print(f"valid voves: {len(moves)}")
+    return moves
+
+def get_knight_moves(board, row, col, colour):
+    moves = []
+    deltas = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]
+
+    for to_row, to_col in deltas:
+        new_row, new_col = row + to_row, col + to_col
+        if 0 <= new_row < 8 and 0 <= new_col < 8:
+            target = board[new_row][new_col]
+            if target == "" or target[0] != colour:
+                moves.append((new_row, new_col))
+
+    print(f"valid voves: {len(moves)}")
     return moves

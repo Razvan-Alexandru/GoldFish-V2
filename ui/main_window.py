@@ -86,12 +86,13 @@ class ChessMainWindow(QMainWindow):
         if self.selected_from is None:
             print(self.game_logic.get_piece(row, col))
             if self.game_logic.get_piece(row, col) != "":
+                self.legal_moves = self.game_logic.get_legal_moves(row, col)
                 self.selected_from = (row, col)
                 print(f"Selected from square: {row}, {col}")
         else:
             from_row, from_col = self.selected_from
             print(f"Selected to square: {row}, {col}")
-            moved = self.game_logic.move_piece(from_row, from_col, row, col)
+            moved = self.game_logic.move_piece(from_row, from_col, row, col, self.legal_moves)
 
             if moved:
                 print("Move Successful")
@@ -99,4 +100,5 @@ class ChessMainWindow(QMainWindow):
                 print("Invalid Move")
 
             self.selected_from = None
+            self.legal_moves = None
             self._update_board_ui()

@@ -1,4 +1,4 @@
-from game.rules import get_pawn_moves
+from game.rules import get_pawn_moves, get_knight_moves
 from game.move import Move
 
 class ChessBoard:
@@ -37,11 +37,13 @@ class ChessBoard:
 
         if piece_type == "pawn":
             return get_pawn_moves(self.board, row, col, colour, self.en_passant_target)
+        if piece_type == "knight":
+            return get_knight_moves(self.board, row, col, colour)
         
         return []
 
-    def move_piece(self, from_row, from_col, to_row, to_col):
-        legal_moves = self.get_legal_moves(from_row, from_col)
+    def move_piece(self, from_row, from_col, to_row, to_col, legal_moves):
+        # legal_moves = self.get_legal_moves(from_row, from_col)
 
         if (to_row, to_col) not in legal_moves:
             return False
