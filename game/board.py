@@ -294,5 +294,33 @@ class ChessBoard:
             return "insufficient material"
         return None  
     
-    def _is_insufficient_material(self):
-        pass
+    def _is_insufficient_material(self): # Not tested yet lol
+        pieces = []
+        bishop_colors = []
+
+        for row in range(8):
+            for col in range(8):
+                piece = self.get_piece(row, col)
+                if piece:
+                    pieces.append((piece, row, col))
+
+        if len(pieces) == 2:
+            return True  # King vs King
+
+        if len(pieces) == 3:
+            for p, _, _ in pieces:
+                if p.endswith("bishop") or p.endswith("knight"):
+                    return True  # King + minor vs King
+
+        if len(pieces) == 4:
+            bishops = [p for p, r, c in pieces if p.endswith("bishop")]
+            if len(bishops) == 2:
+                colors = []
+                for p, r, c in pieces:
+                    if p.endswith("bishop"):
+                        color = (r + c) % 2  # 0: light square, 1: dark square
+                        colors.append(color)
+                if colors[0] == colors[1]:
+                    return True  # Same color bishops
+
+        return False
