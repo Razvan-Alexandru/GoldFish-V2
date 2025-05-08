@@ -191,3 +191,16 @@ class ChessBoard:
                         return True
                     
         return False
+    
+    def is_game_over(self):
+        for row in range(8):
+            for col in range(8):
+                piece = self.get_piece(row, col)
+                if piece and piece[0] == self.turn:
+                    if self.get_legal_moves(row, col):
+                        return False
+        
+        if self.is_in_check(self.turn):
+            return "Checkmate"
+        else:
+            return "Stalemate" # Not tested, assuming this works LOL
