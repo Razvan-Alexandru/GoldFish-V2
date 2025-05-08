@@ -1,15 +1,23 @@
+from dataclasses import dataclass
+
+@dataclass
 class Move:
-    def __init__(self, from_row, from_col, to_row, to_col, piece, captured=None, promotion=None, is_castling=None, is_en_passant=None):
-        self.from_row = from_row
-        self.from_col = from_col
-        self.to_row = to_row
-        self.to_col = to_col
-        self.piece = piece
-        self.captured = captured
-        self.promotion = promotion
-        self.is_castling = is_castling
-        self.is_en_passant = is_en_passant
-    
+    from_row: int
+    from_col: int
+    to_row: int
+    to_col: int
+    piece: str
+    captured: str = None
+    promotion: str = None
+    is_castling: bool = False
+    is_en_passant: bool = False
+
     def __repr__(self):
-        return f"{self.piece}: {self.from_row}, {self.from_col} -> {self.to_row}, {self.to_col}"
-        
+        move_type = ""
+        if self.is_castling:
+            move_type = " (castling)"
+        elif self.is_en_passant:
+            move_type = " (en passant)"
+        elif self.promotion:
+            move_type = f" (promotion to {self.promotion})"
+        return f"{self.piece}: ({self.src_row}, {self.src_col}) -> ({self.dest_row}, {self.dest_col}){move_type}"

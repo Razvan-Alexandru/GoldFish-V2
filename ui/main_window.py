@@ -108,7 +108,7 @@ class ChessMainWindow(QMainWindow):
                 dialog.exec()  # blocks until user clicks
                 promotion = dialog.piece_choice
 
-            moved = self.game_logic.move_piece(from_row, from_col, row, col, self.legal_moves, promotion)
+            moved = self.game_logic.make_move(from_row, from_col, row, col, self.legal_moves, promotion)
 
             if moved:
                 self._update_board_ui()
