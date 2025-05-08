@@ -114,9 +114,10 @@ class ChessMainWindow(QMainWindow):
                 self._update_board_ui()
                 result = self.game_logic.is_game_over()
                 if result == "Checkmate":
-                    print(f"Checkmate! {self.game_logic.turn} loses.")
-                elif result == "stalemate":
-                    print("Stalemate!")
+                    winner = "White" if self.chess_logic.turn == "b" else "Black"
+                    print(f"Checkmate! {winner} wins.")
+                elif result:
+                    print(result.capitalize())
             else:
                 print("Invalid Move")
 

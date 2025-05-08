@@ -1,3 +1,4 @@
+from collections import defaultdict
 from game.rules import get_pawn_moves, get_knight_moves, get_rook_moves, get_bishop_moves, get_queen_moves, get_king_moves
 from game.move import Move
 
@@ -29,6 +30,14 @@ class ChessBoard:
         self.en_passant_target = None
 
         self.move_history = []
+
+        self.position_history = {}
+        self.halfmove_clock = 0
+        self.fullmove_number = 1
+
+        self.game_over = False
+        self.result = None
+
     
     def get_piece(self, row, col):
         return self.board[row][col]
@@ -98,6 +107,9 @@ class ChessBoard:
 
     def move_piece(self, from_row, from_col, to_row, to_col, legal_moves, promotion=None):
 
+        if self.game_over:
+            return False
+
         if (to_row, to_col) not in legal_moves:
             return False
         
@@ -162,6 +174,19 @@ class ChessBoard:
 
         # Save move
         self.move_history.append(Move(from_row, from_col, to_row, to_col, piece, captured, promotion, is_castling, is_en_passant))
+
+        if captured != "" or piece.endswith("pawn"):
+            self.halfmove_clock = 0
+        else:
+            self.halfmove_clock += 1
+
+        if self.turn == "b":
+            self.fullmove_number += 1
+
+        # Track FEN for repetition
+        fen = self.generate_fen(include_clocks=False)
+        self.position_history[fen] = self.position_history.get(fen, 0) + 1
+        print(fen)
     
         # Switch turn
         self.turn = "b" if self.turn == "w" else "w"
@@ -193,6 +218,11 @@ class ChessBoard:
         return False
     
     def is_game_over(self):
+        draw_reason = self.is_draw()
+        if draw_reason:
+            self.game_over = True
+            return f"draw: {draw_reason}"
+    
         for row in range(8):
             for col in range(8):
                 piece = self.get_piece(row, col)
@@ -201,6 +231,68 @@ class ChessBoard:
                         return False
         
         if self.is_in_check(self.turn):
-            return "Checkmate"
+            self.result = "checkmate"
         else:
-            return "Stalemate" # Not tested, assuming this works LOL
+            self.result = "stalemate" # Not tested, assuming this works LOL
+        self.game_over = True
+        return self.result
+        
+    def generate_fen(self, include_clocks=True):
+        fen_rows = []
+        for row in self.board:
+            empty_count = 0
+            fen_row = ""
+            for piece in row:
+                if piece == "":
+                    empty_count += 1
+                else:
+                    if empty_count > 0:
+                        fen_row += str(empty_count)
+                        empty_count = 0
+                    symbol = self._piece_to_fen_symbol(piece)
+                    fen_row += symbol
+            if empty_count > 0:
+                fen_row += str(empty_count)
+            fen_rows.append(fen_row)
+
+        piece_placement = "/".join(fen_rows)
+        active_color = self.turn
+        castling = ""
+        if self.castling_rights["w"]["kingside"]: castling += "K"
+        if self.castling_rights["w"]["queenside"]: castling += "Q"
+        if self.castling_rights["b"]["kingside"]: castling += "k"
+        if self.castling_rights["b"]["queenside"]: castling += "q"
+        castling = castling or "-"
+        en_passant = self._coord_to_alg(self.en_passant_target) if self.en_passant_target else "-"
+
+        if include_clocks:
+            return f"{piece_placement} {active_color} {castling} {en_passant} {self.halfmove_clock} {self.fullmove_number}"
+        else:
+            return f"{piece_placement} {active_color} {castling} {en_passant}"
+        
+    def _piece_to_fen_symbol(self, piece):
+        symbol = piece.split("_")[1][0]
+        symbol_map = {
+            "p": "p", "r": "r", "n": "n", "b": "b", "q": "q", "k": "k"
+        }
+        s = symbol_map.get(symbol, "?")
+        return s.upper() if piece[0] == "w" else s
+
+    def _coord_to_alg(self, coord):
+        if not coord:
+            return "-"
+        row, col = coord
+        return chr(ord('a') + col) + str(8 - row)
+
+    def is_draw(self):
+        if self.halfmove_clock >= 100:
+            return "50-move rule"
+        for fen, count in self.position_history.items():
+            if count >= 3:
+                return "threefold repetition"
+        if self._is_insufficient_material():
+            return "insufficient material"
+        return None  
+    
+    def _is_insufficient_material(self):
+        pass
