@@ -1,22 +1,22 @@
 import numpy as np
 
-def get_position_signature(self):
-        board = self.get_board_state()
+def get_position_signature(chessboard):
+        board = chessboard.get_board_state()
         piece_rows = []
         for row in board:
             piece_rows.append("".join(piece or "." for piece in row))
         board_str = "/".join(piece_rows)
         
         castling = (
-            f"{int(self.castling_rights['w']['kingside'])}"
-            f"{int(self.castling_rights['w']['queenside'])}"
-            f"{int(self.castling_rights['b']['kingside'])}"
-            f"{int(self.castling_rights['b']['queenside'])}"
+            f"{int(chessboard.castling_rights['w']['kingside'])}"
+            f"{int(chessboard.castling_rights['w']['queenside'])}"
+            f"{int(chessboard.castling_rights['b']['kingside'])}"
+            f"{int(chessboard.castling_rights['b']['queenside'])}"
         )
         
-        ep = self.en_passant_target or (-1, -1)
+        ep = chessboard.en_passant_target or (-1, -1)
         
-        return f"{board_str} {self.turn} {castling} {ep}"
+        return f"{board_str} {chessboard.turn} {castling} {ep}"
 
 def encode_board_state(chessboard):
     board = chessboard.get_board_state()

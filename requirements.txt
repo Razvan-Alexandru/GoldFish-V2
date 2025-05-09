@@ -1,2 +1,4 @@
 PyQt6==6.9.0
 numpy
+torch
+torchvision

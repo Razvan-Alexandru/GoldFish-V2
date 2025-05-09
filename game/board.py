@@ -165,7 +165,7 @@ class ChessBoard:
         self.turn = "b" if self.turn == "w" else "w"
 
         # Update FEN and position history
-        signature = get_position_signature()
+        signature = get_position_signature(self)
         self.position_history[signature] = self.position_history.get(signature, 0) + 1
     
         # Save move
