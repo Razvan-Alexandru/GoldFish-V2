@@ -1,3 +1,4 @@
+import os
 from game.board import ChessBoard
 
 def get_all_legal_moves_4096(chessboard: ChessBoard):
@@ -19,3 +20,14 @@ def decoder(encoded_index: int):
     to_col    = encoded_index % 8
 
     return from_row, from_col, to_row, to_col
+
+def cleanup_data(dir="data", max_files=1000):
+    files = sorted([f for f in os.listdir(dir) if f.endswith(".pt")])
+    if len(files) <= max_files:
+        return
+    
+    files_to_delete = files[:len(files) - max_files]
+    for fname in files_to_delete:
+        path = os.path.join(dir, fname)
+        os.remove(path)
+        print(f"Deleted old training file: {path}")

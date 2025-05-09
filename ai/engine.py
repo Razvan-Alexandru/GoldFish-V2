@@ -75,8 +75,11 @@ class Engine():
             else:
                 data["value"] = 1 if data["player"] == winner else -1
 
-    def save_game_data(self):
-        os.makedirs("data", exist_ok=True)  # Ensure /data exists
+    def save_game_data(self, max_games=1000):
+        os.makedirs("data", exist_ok=True)
         filename = f"data/training_game_{int(time.time())}.pt"
         torch.save(self.play_data, filename)
         print(f"Saved {len(self.play_data)} training samples to {filename}")
+
+        # Cleanup
+        cleanup_data(max_files=max_games)
