@@ -16,9 +16,14 @@ class Engine():
     def self_play(self):
         self.play_data = []
         while not self.game.is_game_over():
+
+            # Encode board
             tensor = encode_board_state(self.game)
+
+            # Run the Goldfish model
             policy, value = self.model.forward(tensor)
 
+            # Mask logits, get probabilities
             legal_mask = get_all_legal_moves_4096(self.game)
             logits = policy.squeeze(0)
 
@@ -32,6 +37,7 @@ class Engine():
             move_index = torch.argmax(probabilities).item()
             # move_index = torch.multinomial(probabilities, num_samples=1).item()
 
+            # Play move and store the move
             from_row, from_col, to_row, to_col = decoder(move_index)
             legal_moves = self.game.get_legal_moves(from_row, from_col)
             if (to_row, to_col) in legal_moves:
@@ -42,6 +48,7 @@ class Engine():
                 })
                 self.game.make_move(from_row, from_col, to_row, to_col, legal_moves)
             
+        # Game ended, compute result
         result = self.game.result
 
         if result == "checkmate":
@@ -51,8 +58,16 @@ class Engine():
         else:
             raise ValueError("Unexpected game result format: " + str(result))
         
+        # Attach value to each data in stored game
         for data in self.play_data:
             if winner is None:
                 data["value"] = 0 # Draw
             else:
                 data["value"] = 1 if data["player"] == winner else -1
+        
+        # Save game data to file
+        self.save_game_data()
+
+    def save_game_data(self, filename="training_game_001.pt"):
+        torch.save(self.play_data, filename)
+        print(f"Saved {len(self.play_data)} training samples to {filename}")
