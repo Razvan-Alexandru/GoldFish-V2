@@ -1,6 +1,6 @@
 import torch, torch.nn as nn, torch.nn.functional as F
 
-class Goldfish(nn.Module):
+class GoldfishModel(nn.Module):
 
     def __init__(self):
         super().__init__()
@@ -38,6 +38,6 @@ class Goldfish(nn.Module):
         v = torch.tanh(self.value_fc2(v))
 
         return {
-            "policy": p, # softmax later
+            "policy": p,
             "value": v
         }
