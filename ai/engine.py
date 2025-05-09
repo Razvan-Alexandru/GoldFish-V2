@@ -1,5 +1,5 @@
 import os
-import time
+import uuid
 import torch
 
 from game.board import ChessBoard
@@ -9,7 +9,8 @@ from ai.utils import *
 
 class Engine():
 
-    def __init__(self, device: torch.device):
+    def __init__(self, device: torch.device, debug=False):
+        self.debug = debug
         self.device = device
         self.game = ChessBoard() # Starts new board
         self.model = GoldfishModel().to(self.device)
@@ -66,7 +67,7 @@ class Engine():
         else:
             raise ValueError("Unexpected game result format: " + str(result))
         
-        print(f"Game result: {result}, Winner: {winner}")
+        if self.debug: print(f"Game result: {result}, Winner: {winner}")
         
         # Attach value to each data in stored game
         for data in self.play_data:
@@ -77,9 +78,9 @@ class Engine():
 
     def save_game_data(self, max_games=1000):
         os.makedirs("data", exist_ok=True)
-        filename = f"data/training_game_{int(time.time())}.pt"
+        filename = f"data/training_game_{uuid.uuid4().hex}.pt"
         torch.save(self.play_data, filename)
-        print(f"Saved {len(self.play_data)} training samples to {filename}")
+        if self.debug: print(f"Saved {len(self.play_data)} training samples to {filename}")
 
         # Cleanup
         cleanup_data(max_files=max_games)

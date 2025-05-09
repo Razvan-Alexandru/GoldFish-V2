@@ -176,4 +176,5 @@ cython_debug/
 # Training data and models
 data/
 model/
+logs/
 *.pt

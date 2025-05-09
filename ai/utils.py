@@ -30,4 +30,4 @@ def cleanup_data(dir="data", max_files=1000):
     for fname in files_to_delete:
         path = os.path.join(dir, fname)
         os.remove(path)
-        print(f"Deleted old training file: {path}")
+        # print(f"Deleted old training file: {path}")
