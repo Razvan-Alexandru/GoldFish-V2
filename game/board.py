@@ -1,5 +1,6 @@
 from game.rules import *
 from game.move import Move
+from game.state import get_position_signature, encode_board_state
 
 class ChessBoard:
     def __init__(self):
@@ -164,8 +165,8 @@ class ChessBoard:
         self.turn = "b" if self.turn == "w" else "w"
 
         # Update FEN and position history
-        fen = self.generate_fen(include_clocks=False)
-        self.position_history[fen] = self.position_history.get(fen, 0) + 1
+        signature = get_position_signature()
+        self.position_history[signature] = self.position_history.get(signature, 0) + 1
     
         # Save move
         self.move_history.append(move)
@@ -216,53 +217,6 @@ class ChessBoard:
             self.result = "stalemate" # Not tested, assuming this works LOL
         self.game_over = True
         return self.result
-        
-    def generate_fen(self, include_clocks=True):
-        fen_rows = []
-        for row in self.board:
-            empty_count = 0
-            fen_row = ""
-            for piece in row:
-                if piece == "":
-                    empty_count += 1
-                else:
-                    if empty_count > 0:
-                        fen_row += str(empty_count)
-                        empty_count = 0
-                    symbol = self._piece_to_fen_symbol(piece)
-                    fen_row += symbol
-            if empty_count > 0:
-                fen_row += str(empty_count)
-            fen_rows.append(fen_row)
-
-        piece_placement = "/".join(fen_rows)
-        active_color = self.turn
-        castling = ""
-        if self.castling_rights["w"]["kingside"]: castling += "K"
-        if self.castling_rights["w"]["queenside"]: castling += "Q"
-        if self.castling_rights["b"]["kingside"]: castling += "k"
-        if self.castling_rights["b"]["queenside"]: castling += "q"
-        castling = castling or "-"
-        en_passant = self._coord_to_alg(self.en_passant_target) if self.en_passant_target else "-"
-
-        if include_clocks:
-            return f"{piece_placement} {active_color} {castling} {en_passant} {self.halfmove_clock} {self.fullmove_number}"
-        else:
-            return f"{piece_placement} {active_color} {castling} {en_passant}"
-        
-    def _piece_to_fen_symbol(self, piece):
-        symbol = piece.split("_")[1][0]
-        symbol_map = {
-            "p": "p", "r": "r", "n": "n", "b": "b", "q": "q", "k": "k"
-        }
-        s = symbol_map.get(symbol, "?")
-        return s.upper() if piece[0] == "w" else s
-
-    def _coord_to_alg(self, coord):
-        if not coord:
-            return "-"
-        row, col = coord
-        return chr(ord('a') + col) + str(8 - row)
 
     def is_draw(self):
         if self.halfmove_clock >= 100:
