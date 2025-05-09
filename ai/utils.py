@@ -18,4 +18,4 @@ def decoder(encoded_index: int):
     to_row    = (encoded_index % 64) // 8,
     to_col    = encoded_index % 8
 
-    return { from_row, from_col, to_row, to_col }
+    return from_row, from_col, to_row, to_col
