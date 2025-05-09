@@ -202,7 +202,8 @@ class ChessBoard:
         draw_reason = self.is_draw()
         if draw_reason:
             self.game_over = True
-            return f"draw: {draw_reason}"
+            self.result = f"draw: {draw_reason}"
+            return self.result
     
         for row in range(8):
             for col in range(8):
@@ -228,7 +229,7 @@ class ChessBoard:
             return "insufficient material"
         return None  
     
-    def _is_insufficient_material(self): # Not tested yet lol
+    def _is_insufficient_material(self): # Not tested yet
         pieces = []
         bishop_colors = []
 

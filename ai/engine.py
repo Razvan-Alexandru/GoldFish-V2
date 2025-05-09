@@ -14,6 +14,7 @@ class Engine():
         self.self_play()
 
     def self_play(self):
+        self.play_data = []
         while not self.game.is_game_over():
             tensor = encode_board_state(self.game)
             policy, value = self.model.forward(tensor)
@@ -34,4 +35,24 @@ class Engine():
             from_row, from_col, to_row, to_col = decoder(move_index)
             legal_moves = self.game.get_legal_moves(from_row, from_col)
             if (to_row, to_col) in legal_moves:
+                self.play_data.append({
+                    "state": tensor.detach().cpu(),
+                    "policy": probabilities.detach().cpu(),
+                    "player": self.game.turn
+                })
                 self.game.make_move(from_row, from_col, to_row, to_col, legal_moves)
+            
+        result = self.game.result
+
+        if result == "checkmate":
+            winner = "b" if self.game.turn == "w" else "w"
+        elif result == "stalemate" or (result and result.startswith("draw")):
+            winner = None
+        else:
+            raise ValueError("Unexpected game result format: " + str(result))
+        
+        for data in self.play_data:
+            if winner is None:
+                data["value"] = 0 # Draw
+            else:
+                data["value"] = 1 if data["player"] == winner else -1
