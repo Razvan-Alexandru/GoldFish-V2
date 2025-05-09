@@ -13,9 +13,9 @@ def get_all_legal_moves_4096(chessboard: ChessBoard):
     return legal_moves_4096
 
 def decoder(encoded_index: int):
-    from_row  = encoded_index // 512,
-    from_col  = (encoded_index % 512) // 64,
-    to_row    = (encoded_index % 64) // 8,
+    from_row  = encoded_index // 512
+    from_col  = (encoded_index % 512) // 64
+    to_row    = (encoded_index % 64) // 8
     to_col    = encoded_index % 8
 
     return from_row, from_col, to_row, to_col

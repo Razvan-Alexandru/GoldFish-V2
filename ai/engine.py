@@ -1,5 +1,6 @@
-import torch
+import os
 import time
+import torch
 
 from game.board import ChessBoard
 from game.state import encode_board_state
@@ -8,19 +9,21 @@ from ai.utils import *
 
 class Engine():
 
-    def __init__(self):
+    def __init__(self, device: torch.device):
+        self.device = device
         self.game = ChessBoard() # Starts new board
-        self.board = self.game.get_board_state
-        self.model = GoldfishModel()
+        self.model = GoldfishModel().to(self.device)
+        self.play_data = []
+
         self.self_play()
+        self.save_game_data()
 
     def self_play(self):
-        self.play_data = []
         while not self.game.is_game_over():
 
             # Encode board
             with torch.no_grad():
-                tensor = encode_board_state(self.game).unsqueeze(0)
+                tensor = torch.tensor(encode_board_state(self.game)).permute(2, 0, 1).unsqueeze(0).float().to(self.device)
 
                 # Run the Goldfish model
                 output = self.model.forward(tensor)
@@ -51,6 +54,7 @@ class Engine():
                 self.game.make_move(from_row, from_col, to_row, to_col, legal_moves)
             else:
                 print("Illigal move!")
+                break
             
         # Game ended, compute result
         result = self.game.result
@@ -70,10 +74,9 @@ class Engine():
                 data["value"] = 0 # Draw
             else:
                 data["value"] = 1 if data["player"] == winner else -1
-        
-        # Save game data to file
-        self.save_game_data()
 
-    def save_game_data(self, filename=f"training_game_{int(time.time())}.pt"):
+    def save_game_data(self):
+        os.makedirs("data", exist_ok=True)  # Ensure /data exists
+        filename = f"data/training_game_{int(time.time())}.pt"
         torch.save(self.play_data, filename)
         print(f"Saved {len(self.play_data)} training samples to {filename}")
